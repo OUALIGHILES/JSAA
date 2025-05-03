@@ -1,0 +1,9 @@
+{
+  "/api/auth/signup/route": "app/api/auth/signup/route.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/matches/upcoming/page": "app/matches/upcoming/page.js",
+  "/tickets/season/page": "app/tickets/season/page.js",
+  "/tickets/choix/page": "app/tickets/choix/page.js",
+  "/tickets/mes-abonnements/page": "app/tickets/mes-abonnements/page.js",
+  "/matches/standings/page": "app/matches/standings/page.js"
+}
