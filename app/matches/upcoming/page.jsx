@@ -246,7 +246,7 @@ export default function UpcomingMatchesPage() {
                         <div className="flex flex-col items-center">
                           <div className="mb-3">
                             <Image
-                              src={match.homeTeam.logoUrl || "/images/default-team.png"}
+                              src={match.homeTeam.logoUrl }
                               alt={match.homeTeam.name}
                               width={70}
                               height={70}
@@ -263,7 +263,7 @@ export default function UpcomingMatchesPage() {
                         <div className="flex flex-col items-center">
                           <div className="mb-3">
                             <Image
-                              src={match.awayTeam.logoUrl || "/images/default-team.png"}
+                              src={match.awayTeam.logoUrl }
                               alt={match.awayTeam.name}
                               width={70}
                               height={70}

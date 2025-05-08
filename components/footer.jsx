@@ -248,7 +248,7 @@ export default function Footer() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             onClick={scrollToTop}
-            className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-yellow-500 text-green-900 flex items-center justify-center shadow-lg z-50 hover:bg-yellow-400 transition-colors duration-300"
+            className="fixed bottom-28 right-6 w-12 h-12 rounded-full bg-yellow-500 text-green-900 flex items-center justify-center shadow-lg z-50 hover:bg-yellow-400 transition-colors duration-300"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >

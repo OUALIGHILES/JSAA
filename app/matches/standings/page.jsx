@@ -94,7 +94,7 @@ export default function Standings() {
                         <div className="flex items-center space-x-3">
                           <div className="relative w-8 h-8">
                             <Image
-                              src={team.logo || "/images/default-team.png"}
+                              src={team.logo }
                               alt={team.name}
                               fill
                               className="object-contain"

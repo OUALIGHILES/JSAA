@@ -10,10 +10,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { motion } from "framer-motion"
 import { api, formatDate } from "@/lib/api"
 import { useAuth } from "@/context/auth-context"
+import Chatbot from "@/components/Chatbot"
 
 // Image par défaut pour les équipes
-const DEFAULT_TEAM_LOGO = "/images/default-team.png"
-
+const DEFAULT_TEAM_LOGO = "/"
 export default function Home() {
   const [activeMatch, setActiveMatch] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
@@ -203,9 +203,7 @@ export default function Home() {
                             width={70}
                             height={70}
                             className="relative z-10"
-                            onError={(e) => {
-                              e.currentTarget.src = DEFAULT_TEAM_LOGO
-                            }}
+
                           />
                         </div>
                         <span className="font-bold text-lg">{match.homeTeam.name}</span>
@@ -228,9 +226,7 @@ export default function Home() {
                             width={70}
                             height={70}
                             className="relative z-10"
-                            onError={(e) => {
-                              e.currentTarget.src = DEFAULT_TEAM_LOGO
-                            }}
+
                           />
                         </div>
                         <span className="font-bold text-lg">{match.awayTeam.name}</span>
@@ -444,7 +440,7 @@ export default function Home() {
                 <input
                   type="email"
                   placeholder="Votre adresse email"
-                  className="flex-grow px-4 py-4 rounded-l-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
+                  className="flex-grow px-4  rounded-l-lg text-black focus:outline-none focus:ring-2 focus:ring-yellow-400 transition-all duration-300"
                 />
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                   <Button className="rounded-l-none bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-400 hover:to-yellow-500 text-green-900 font-bold py-4 px-6">
@@ -535,9 +531,7 @@ export default function Home() {
                             width={70}
                             height={70}
                             className="relative z-10"
-                            onError={(e) => {
-                              e.currentTarget.src = DEFAULT_TEAM_LOGO
-                            }}
+
                           />
                         </div>
                         <span className="font-bold text-lg">{match.homeTeam.name}</span>
@@ -560,9 +554,7 @@ export default function Home() {
                             width={70}
                             height={70}
                             className="relative z-10"
-                            onError={(e) => {
-                              e.currentTarget.src = DEFAULT_TEAM_LOGO
-                            }}
+
                           />
                         </div>
                         <span className="font-bold text-lg">{match.awayTeam.name}</span>
@@ -632,9 +624,7 @@ export default function Home() {
                             width={70}
                             height={70}
                             className="relative z-10"
-                            onError={(e) => {
-                              e.currentTarget.src = DEFAULT_TEAM_LOGO
-                            }}
+
                           />
                         </div>
                         <span className="font-bold text-lg">{match.homeTeam.name}</span>
@@ -657,9 +647,7 @@ export default function Home() {
                             width={70}
                             height={70}
                             className="relative z-10"
-                            onError={(e) => {
-                              e.currentTarget.src = DEFAULT_TEAM_LOGO
-                            }}
+
                           />
                         </div>
                         <span className="font-bold text-lg">{match.awayTeam.name}</span>
@@ -683,6 +671,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Add Chatbot component */}
+      <Chatbot />
     </div>
   )
 }

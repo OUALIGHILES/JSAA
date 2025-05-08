@@ -94,7 +94,7 @@ export default function Results() {
                         <div className="flex items-center space-x-3">
                           <div className="relative w-12 h-12">
                             <Image
-                              src={match.homeTeam?.logo || "/images/default-team.png"}
+                              src={match.homeTeam?.logo}
                               alt={match.homeTeam?.name || "Équipe à domicile"}
                               fill
                               className="object-contain"
@@ -113,7 +113,7 @@ export default function Results() {
                         <div className="flex items-center space-x-3">
                           <div className="relative w-12 h-12">
                             <Image
-                              src={match.awayTeam?.logo || "/images/default-team.png"}
+                              src={match.awayTeam?.logo }
                               alt={match.awayTeam?.name || "Équipe à l'extérieur"}
                               fill
                               className="object-contain"
