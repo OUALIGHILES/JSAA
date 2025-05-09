@@ -72,6 +72,7 @@ export default function MatchDayTicketsPage() {
       color: "bg-yellow-100 border-yellow-500",
     },
   ]
+  
 
   const handleSelectMatch = (match) => {
     setSelectedMatch(match)
@@ -119,6 +120,29 @@ export default function MatchDayTicketsPage() {
       },
     },
   }
+  const handlePurchase = () => {
+    console.log(123333)
+    // Making fetch request without waiting for response
+    fetch('/api/payment', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        // Add any data you need to send
+        purchaseId: 'your-purchase-id'
+      })
+    });
+    
+    // Not using .then() or await since backend will handle redirect
+    // The loading state is just for visual feedback
+    
+    // Optional: You could add a small timeout before assuming redirect will happen
+    // setTimeout(() => {
+    //   setIsLoading(false);
+    // }, 2000);
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-green-50">
@@ -591,7 +615,7 @@ export default function MatchDayTicketsPage() {
                   </div>
 
                   <div className="mt-8">
-                    <Button className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-400 hover:to-yellow-500 text-green-900 py-6 text-lg font-bold">
+                    <Button onClick={handlePurchase} className="w-full bg-gradient-to-r from-yellow-500 to-yellow-400 hover:from-yellow-400 hover:to-yellow-500 text-green-900 py-6 text-lg font-bold">
                       Complete Purchase
                     </Button>
                     <p className="text-center text-sm text-gray-500 mt-4">
