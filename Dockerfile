@@ -20,6 +20,7 @@ RUN rm -rf node_modules package-lock.json
 
 # Install dependencies with clean build
 RUN npm install --legacy-peer-deps
+RUN npm install @google/generative-ai
 
 # Copy rest of the app
 COPY . .
