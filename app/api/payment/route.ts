@@ -1,12 +1,11 @@
 // File: /app/api/payment/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { ChargilyClient } from 'chargily-epay-js';
+import { ChargilyClient } from '@chargily/chargily-pay';
  // Import your custom errors
 
 // Reuse the existing createChargilyCheckoutSession function
 async function createChargilyCheckoutSession(
-  plan: { name: string; price: number },
-  hotelId: string
+ 
 ): Promise<string> {
   try {
     const apiSecretKey = process.env.CHARGILY_SECRET_KEY;
@@ -19,17 +18,14 @@ async function createChargilyCheckoutSession(
     });
     
     // Ensure price is a valid number and convert to DZD if needed
-    const amount = Math.round(plan.price); // Chargily might expect integers
+     // Chargily might expect integers
     
     const checkoutData = {
-      amount,
+      amount:5000,
       currency: "dzd",
       success_url: `${process.env.SERVER_URL}/login`,
       failure_url: `${process.env.SERVER_URL}`,
-      metadata: [{
-        hotelId,
-        planName: plan.name
-      }]
+      
     };
     
     const newCheckout = await client.createCheckout(checkoutData);
@@ -39,7 +35,7 @@ async function createChargilyCheckoutSession(
     
     return newCheckout.checkout_url;
   } catch (error) {
-    if (error instanceof NotFoundError) {
+    if (error instanceof Error) {
       throw error;
     }
     // Include error details in the thrown error
@@ -52,35 +48,40 @@ async function createChargilyCheckoutSession(
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse the request body
-    const body = await request.json();
-    const { plan, hotelId } = body;
     
-    // Validate the required fields
-    if (!plan || !hotelId) {
-      return NextResponse.json(
-        { error: 'Les détails du plan et l\'ID de l\'hôtel sont requis' },
-        { status: 400 }
-      );
-    }
+    // Parse the request body
+    
     
     // Create the Chargily checkout session
-    const checkoutUrl = await createChargilyCheckoutSession(plan, hotelId);
+    const checkoutUrl = await createChargilyCheckoutSession();
+     console.log(checkoutUrl)
     
     // Return the checkout URL for redirection
-    return NextResponse.json({ checkoutUrl }, { status: 200 });
-  } catch (error) {
-    console.error('Payment error:', error);
-    
-    // Handle different types of errors
-    if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 404 });
-    } 
-    
-    // Generic error handling
-    return NextResponse.json(
-      { error: 'Une erreur est survenue lors du traitement du paiement' },
-      { status: 500 }
-    );
+    return NextResponse.json({ 
+        success: true,
+        checkoutUrl: checkoutUrl 
+      }, { status: 200 });
+
+    } catch (error) {
+      console.error('Payment error:', error);
+      
+      // Handle different types of errors
+      if (error instanceof Error) {
+        return NextResponse.json({ 
+          success: false, 
+          error: error.message 
+        }, { status: 404 });
+      } else if (error instanceof Error) {
+        return NextResponse.json({ 
+          success: false, 
+          error: error.message 
+        }, { status: 400 });
+      }
+      
+      // Generic error handling
+      return NextResponse.json({
+        success: false,
+        error: 'Une erreur est survenue lors du traitement du paiement'
+      }, { status: 500 });
+    }
   }
-}

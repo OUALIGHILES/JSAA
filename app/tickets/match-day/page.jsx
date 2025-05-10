@@ -121,8 +121,7 @@ export default function MatchDayTicketsPage() {
     },
   }
   const handlePurchase = () => {
-    console.log(123333)
-    // Making fetch request without waiting for response
+    // Making fetch request to payment API
     fetch('/api/payment', {
       method: 'POST',
       headers: {
@@ -132,15 +131,21 @@ export default function MatchDayTicketsPage() {
         // Add any data you need to send
         purchaseId: 'your-purchase-id'
       })
+    })
+    .then(response => {
+      if (response.ok) {
+        // Redirect to Charjily website after successful payment
+        window.location.href = 'https://pay.chargily.dz/test';
+      } else {
+        // Handle error if needed
+        console.error('Payment failed');
+        // You could set an error state here if you want to show an error message
+      }
+    })
+    .catch(error => {
+      console.error('Error processing payment:', error);
+      // Handle network errors
     });
-    
-    // Not using .then() or await since backend will handle redirect
-    // The loading state is just for visual feedback
-    
-    // Optional: You could add a small timeout before assuming redirect will happen
-    // setTimeout(() => {
-    //   setIsLoading(false);
-    // }, 2000);
   };
 
 
