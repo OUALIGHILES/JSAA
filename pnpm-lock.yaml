@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@chargily/chargily-pay':
+        specifier: ^2.1.0
+        version: 2.1.0
       '@emotion/is-prop-valid':
         specifier: latest
         version: 1.3.1
@@ -220,6 +223,9 @@ packages:
   '@babel/runtime@7.27.1':
     resolution: {integrity: sha512-1x3D2xEk2fRo3PAhwQwu5UubzgiVWSXTBfWpVd2Mx2AzRqJuDJCsgaDVZ7HB5iGzDW1Hl1sWN2mFyKjmR9uAog==}
     engines: {node: '>=6.9.0'}
+
+  '@chargily/chargily-pay@2.1.0':
+    resolution: {integrity: sha512-BMmvgowoZN2ETqNcSTle7VIVX4wHYvxTzk1Cu3o1TV+1Lj2P1hznIo6dgj7Die9ALUsBAnSR+SjuhYsrN1LlPw==}
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -2439,6 +2445,8 @@ snapshots:
   '@alloc/quick-lru@5.2.0': {}
 
   '@babel/runtime@7.27.1': {}
+
+  '@chargily/chargily-pay@2.1.0': {}
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
