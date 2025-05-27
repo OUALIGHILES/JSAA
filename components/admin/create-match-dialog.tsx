@@ -1,10 +1,5 @@
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useTeams } from "@/hooks/use-teams"
+import { useState } from "react"
 
 interface CreateMatchDialogProps {
   open: boolean
@@ -12,7 +7,8 @@ interface CreateMatchDialogProps {
   onSubmit: (data: any) => void
 }
 
-export function CreateMatchDialog({ open, onOpenChange, onSubmit }: CreateMatchDialogProps) {
+// Mock teams data for demonstration
+export default function CreateMatchDialog({ open, onOpenChange, onSubmit }: CreateMatchDialogProps) {
   const [formData, setFormData] = useState({
     homeTeamId: "",
     awayTeamId: "",
@@ -20,104 +16,168 @@ export function CreateMatchDialog({ open, onOpenChange, onSubmit }: CreateMatchD
     place: "",
     status: "SCHEDULED"
   })
-
-  const { teams, loading } = useTeams()
+  
+  // Mock teams loading state
+  const teams = useTeams();
+  const loading = false
+  
+  // Format date for datetime-local input (YYYY-MM-DDThh:mm)
+  const formatDateForInput = (dateString: string) => {
+    if (!dateString) return "";
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return "";
+      
+      // Format as YYYY-MM-DDThh:mm
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const day = String(date.getDate()).padStart(2, "0");
+      const hours = String(date.getHours()).padStart(2, "0");
+      const minutes = String(date.getMinutes()).padStart(2, "0");
+      
+      return `${year}-${month}-${day}T${hours}:${minutes}`;
+    } catch (e) {
+      console.error("Date formatting error:", e);
+      return "";
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSubmit(formData)
   }
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onOpenChange(false)
+    }
+  }
+
+  if (!open) return null
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Créer un nouveau match</DialogTitle>
-        </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <div 
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      onClick={handleBackdropClick}
+    >
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-md mx-4 p-6">
+        {/* Dialog Header */}
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-2">
+            Créer un nouveau match
+          </h2>
+          <p className="text-sm text-gray-600">
+            Complétez les informations pour ajouter un nouveau match.
+          </p>
+        </div>
+
+        {/* Form */}
+        <div className="space-y-4">
+          {/* Home Team */}
           <div className="space-y-2">
-            <Label htmlFor="homeTeam">Équipe à domicile</Label>
-            <Select
+            <label htmlFor="homeTeam" className="block text-sm font-medium text-gray-700">
+              Équipe à domicile
+            </label>
+            <select
+              id="homeTeam"
               value={formData.homeTeamId}
-              onValueChange={(value) => setFormData({ ...formData, homeTeamId: value })}
+              onChange={(e) => setFormData({ ...formData, homeTeamId: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionner une équipe" />
-              </SelectTrigger>
-              <SelectContent>
-                {teams.map((team) => (
-                  <SelectItem key={team.id} value={team.id}>
-                    {team.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <option value="">Sélectionner une équipe</option>
+              {teams.teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+            </select>
           </div>
 
+          {/* Away Team */}
           <div className="space-y-2">
-            <Label htmlFor="awayTeam">Équipe à l'extérieur</Label>
-            <Select
+            <label htmlFor="awayTeam" className="block text-sm font-medium text-gray-700">
+              Équipe à l'extérieur
+            </label>
+            <select
+              id="awayTeam"
               value={formData.awayTeamId}
-              onValueChange={(value) => setFormData({ ...formData, awayTeamId: value })}
+              onChange={(e) => setFormData({ ...formData, awayTeamId: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionner une équipe" />
-              </SelectTrigger>
-              <SelectContent>
-                {teams.map((team) => (
-                  <SelectItem key={team.id} value={team.id}>
-                    {team.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <option value="">Sélectionner une équipe</option>
+              {teams.teams.map((team) => (
+                <option key={team.id} value={team.id}>
+                  {team.name}
+                </option>
+              ))}
+            </select>
           </div>
 
+          {/* Date and Time */}
           <div className="space-y-2">
-            <Label htmlFor="date">Date et heure</Label>
-            <Input
+            <label htmlFor="date" className="block text-sm font-medium text-gray-700">
+              Date et heure
+            </label>
+            <input
               id="date"
               type="datetime-local"
               value={formData.date}
               onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
+          {/* Place */}
           <div className="space-y-2">
-            <Label htmlFor="place">Lieu</Label>
-            <Input
+            <label htmlFor="place" className="block text-sm font-medium text-gray-700">
+              Lieu
+            </label>
+            <input
               id="place"
+              type="text"
               value={formData.place}
               onChange={(e) => setFormData({ ...formData, place: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
+          {/* Status */}
           <div className="space-y-2">
-            <Label htmlFor="status">Statut</Label>
-            <Select
+            <label htmlFor="status" className="block text-sm font-medium text-gray-700">
+              Statut
+            </label>
+            <select
+              id="status"
               value={formData.status}
-              onValueChange={(value) => setFormData({ ...formData, status: value })}
+              onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
-              <SelectTrigger>
-                <SelectValue placeholder="Sélectionner un statut" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="SCHEDULED">Programmé</SelectItem>
-                <SelectItem value="IN_PROGRESS">En cours</SelectItem>
-                <SelectItem value="COMPLETED">Terminé</SelectItem>
-                <SelectItem value="CANCELLED">Annulé</SelectItem>
-              </SelectContent>
-            </Select>
+              <option value="SCHEDULED">Programmé</option>
+              <option value="IN_PROGRESS">En cours</option>
+              <option value="COMPLETED">Terminé</option>
+              <option value="CANCELLED">Annulé</option>
+            </select>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-2 pt-4">
+            <button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
               Annuler
-            </Button>
-            <Button type="submit">Créer</Button>
+            </button>
+            <button
+              type="button"
+              onClick={handleSubmit}
+              className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              Créer
+            </button>
           </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </div>
   )
-} 
+}

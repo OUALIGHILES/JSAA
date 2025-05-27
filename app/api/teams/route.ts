@@ -1,14 +1,13 @@
 import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
-
-const prisma = new PrismaClient()
+import { prisma } from "@/lib/prisma"
 
 export async function GET() {
   try {
     const teams = await prisma.team.findMany({
       select: {
         id: true,
-        name: true
+        name: true,
+        logoUrl: true
       },
       orderBy: {
         name: "asc"
@@ -20,7 +19,7 @@ export async function GET() {
       data: teams
     })
   } catch (error) {
-    console.error("❌ [TEAMS] Erreur:", error)
+    console.error("Error fetching teams:", error)
     return NextResponse.json(
       { success: false, message: "Une erreur est survenue lors de la récupération des équipes" },
       { status: 500 }
@@ -28,10 +27,11 @@ export async function GET() {
   }
 }
 
+// Create a new team
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name } = body
+    const { name, logoUrl } = body
 
     if (!name) {
       return NextResponse.json(
@@ -40,9 +40,15 @@ export async function POST(request: Request) {
       )
     }
 
+    // Generate a unique id for the team
+    const id = crypto.randomUUID();
+
     const team = await prisma.team.create({
       data: {
-        name
+        id,
+        name,
+        logoUrl: logoUrl || null,
+        classment: 0 // Default value
       }
     })
 
@@ -51,10 +57,10 @@ export async function POST(request: Request) {
       data: team
     })
   } catch (error) {
-    console.error("❌ [TEAMS] Erreur:", error)
+    console.error("Error creating team:", error)
     return NextResponse.json(
       { success: false, message: "Une erreur est survenue lors de la création de l'équipe" },
       { status: 500 }
     )
   }
-} 
+}

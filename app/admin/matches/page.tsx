@@ -6,9 +6,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Plus, Trash2, Edit } from "lucide-react"
 import { format } from "date-fns"
 import { fr } from "date-fns/locale"
-import { CreateMatchDialog } from "@/components/admin/create-match-dialog"
-import { UpdateMatchDialog } from "@/components/admin/update-match-dialog"
-import { DeleteMatchDialog } from "@/components/admin/delete-match-dialog"
+import { api } from "@/lib/api"
+import CreateMatchDialog from "@/components/admin/create-match-dialog"
+import DeleteMatchDialog from "@/components/admin/delete-match-dialog"
+import UpdateMatchDialog from "@/components/admin/update-match-dialog"
 
 interface Match {
   id: string
@@ -37,16 +38,14 @@ export default function MatchesPage() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null)
 
+  // Fetch all matches (Read)
   const fetchMatches = async () => {
+    setLoading(true)
     try {
-      const response = await fetch("/api/admin/matches")
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.message || "Erreur lors de la récupération des matchs")
-      }
-
-      setMatches(result.data)
+      const response = await api.matches.getUpcoming()
+      if (!response || !response.data) throw new Error("Erreur lors de la récupération des matchs")
+      setMatches(response.data)
+      setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Une erreur est survenue")
     } finally {
@@ -58,68 +57,53 @@ export default function MatchesPage() {
     fetchMatches()
   }, [])
 
+  // Create
   const handleCreateMatch = async (matchData: any) => {
     try {
-      const response = await fetch("/api/admin/matches", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(matchData),
-      })
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la création du match")
-      }
-
+      await api.matches.addMatch(matchData)
       await fetchMatches()
       setIsCreateDialogOpen(false)
     } catch (error) {
-      console.error("Erreur:", error)
+      setError("Erreur lors de la création du match")
     }
   }
 
+  // Update
   const handleUpdateMatch = async (matchData: any) => {
     if (!selectedMatch) return
-
     try {
-      const response = await fetch(`/api/admin/matches/${selectedMatch.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(matchData),
-      })
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la mise à jour du match")
-      }
-
+      await api.matches.updateMatch(selectedMatch.id, matchData)
       await fetchMatches()
       setIsUpdateDialogOpen(false)
       setSelectedMatch(null)
     } catch (error) {
-      console.error("Erreur:", error)
+      setError("Erreur lors de la mise à jour du match")
     }
   }
 
+  // Delete
   const handleDeleteMatch = async (matchId: string) => {
     try {
-      const response = await fetch(`/api/admin/matches/${matchId}`, {
-        method: "DELETE",
-      })
-
-      if (!response.ok) {
-        throw new Error("Erreur lors de la suppression du match")
-      }
-
+      await api.matches.deleteMatch(matchId)
       await fetchMatches()
       setIsDeleteDialogOpen(false)
       setSelectedMatch(null)
     } catch (error) {
-      console.error("Erreur:", error)
+      setError("Erreur lors de la suppression du match")
     }
   }
+
+  // UpdateMatchDialog expects homeTeamId and awayTeamId, so map selectedMatch
+  const selectedMatchForDialog = selectedMatch
+    ? {
+      id: selectedMatch.id,
+      homeTeamId: selectedMatch.homeTeam.id,
+      awayTeamId: selectedMatch.awayTeam.id,
+      date: selectedMatch.date,
+      place: selectedMatch.place,
+      status: selectedMatch.status,
+    }
+    : null
 
   if (loading) {
     return (
@@ -148,14 +132,12 @@ export default function MatchesPage() {
           <Plus className="mr-2 h-4 w-4" />
           Ajouter un match
         </Button>
-      </div>
-
-      <div className="grid gap-6">
-        {matches.map((match) => (
-          <Card key={match.id}>
+      </div>      <div className="grid gap-6">
+        {matches.filter(match => match !== null).map((match) => (
+          <Card key={match?.id || Math.random()}>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>
-                {match.homeTeam.name} vs {match.awayTeam.name}
+                {(match?.homeTeam?.name || "?") + " vs " + (match?.awayTeam?.name || "?")}
               </CardTitle>
               <div className="flex gap-2">
                 <Button
@@ -184,19 +166,19 @@ export default function MatchesPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Date</p>
-                  <p>{format(new Date(match.date), "dd MMM yyyy à HH:mm", { locale: fr })}</p>
+                  <p>{match?.date ? format(new Date(match.date), "dd MMM yyyy à HH:mm", { locale: fr }) : "-"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Lieu</p>
-                  <p>{match.place}</p>
+                  <p>{match?.place || "-"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Statut</p>
-                  <p>{match.status}</p>
+                  <p>{match?.status || "-"}</p>
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Billets vendus</p>
-                  <p>{match._count.tickets}</p>
+                  <p>{match?._count?.tickets ?? 0}</p>
                 </div>
               </div>
             </CardContent>
@@ -206,20 +188,32 @@ export default function MatchesPage() {
 
       <CreateMatchDialog
         open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
+        onOpenChange={(open) => {
+          console.log("yeaaah")
+          setIsCreateDialogOpen(open)
+          if (!open) setSelectedMatch(null)
+        }}
         onSubmit={handleCreateMatch}
-      />
-
-      <UpdateMatchDialog
-        open={isUpdateDialogOpen}
-        onOpenChange={setIsUpdateDialogOpen}
-        match={selectedMatch}
+      />      <UpdateMatchDialog
+        open={isUpdateDialogOpen && !!selectedMatchForDialog}
+        onOpenChange={(open) => {
+          setIsUpdateDialogOpen(open)
+          if (!open) {
+            setTimeout(() => setSelectedMatch(null), 300); // Give dialog time to close
+          }
+        }}
+        match={selectedMatchForDialog}
         onSubmit={handleUpdateMatch}
       />
 
       <DeleteMatchDialog
-        open={isDeleteDialogOpen}
-        onOpenChange={setIsDeleteDialogOpen}
+        open={isDeleteDialogOpen && !!selectedMatch}
+        onOpenChange={(open) => {
+          setIsDeleteDialogOpen(open)
+          if (!open) {
+            setTimeout(() => setSelectedMatch(null), 300); // Give dialog time to close
+          }
+        }}
         match={selectedMatch}
         onDelete={handleDeleteMatch}
       />
